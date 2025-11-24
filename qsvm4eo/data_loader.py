@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 
-def load(data_path, num_features, scale_features=False):
+def load_data(data_path, num_features, scale_features=False):
     """
     Load the data.
 
