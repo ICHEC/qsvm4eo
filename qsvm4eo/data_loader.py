@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 
+
 def load_data(data_path, num_features, scale_features=False):
     """
     Load the data.
@@ -17,12 +18,12 @@ def load_data(data_path, num_features, scale_features=False):
         is 0 and variance is 1. Defaults to False.
     """
     if num_features == 4:
-        features = ['B02', 'B03', 'B04', 'B08']
+        features = ["B02", "B03", "B04", "B08"]
     elif num_features == 8:
-        features = ['B02', 'B03', 'B04', 'B08', 'NDVI', 'EVI', 'SAVI', 'NDWI']
+        features = ["B02", "B03", "B04", "B08", "NDVI", "EVI", "SAVI", "NDWI"]
     else:
         raise Exception("`num_features` must be 4 or 8")
-    
+
     data_train = pd.read_csv(f"{data_path}/data/train_32.csv", header=0)
     x_train = np.array(data_train[features].values, dtype=float)
     y_train = data_train["Label"].values
