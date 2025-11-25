@@ -64,3 +64,16 @@ class Kernel:
                 js = distance.jensenshannon(p_train[i], p_test[j]) ** 2.0
                 gram[i, j] = np.exp(-self.mu * js)
         return gram
+
+
+def compute_excitation_count(probs):
+    """Compute the number of excitations from the state probabilities."""
+    num_features = int(np.log2(probs.shape[1]))
+    excitations = np.zeros((probs.shape[0], num_features + 1))
+
+    for i in range(2**num_features):
+        n_excit = np.binary_repr(i, num_features).count(
+            "1"
+        )  # the number of excitations
+        excitations[:, n_excit] += probs[:, i]
+    return excitations

@@ -44,10 +44,11 @@ print(qbits_train[:4])
 
 print("Training:")
 probs_train = compute_probabilities(qbits_train)
+excitations_train = qsvm4eo.compute_excitation_count(probs_train)
 
 # Compute the kernel
 kernel = qsvm4eo.Kernel()
-gram_train = kernel.compute_gram_train(probs_train)
+gram_train = kernel.compute_gram_train(excitations_train)
 
 # Fit the SVM ad get the score
 model = SVC(kernel="precomputed")
@@ -56,9 +57,10 @@ train_score = model.score(gram_train, y_train)
 
 print("Testing")
 probs_test = compute_probabilities(qbits_test)
+excitations_test = qsvm4eo.compute_excitation_count(probs_test)
 
 # Compute the kernel and score
-gram_test = kernel.compute_gram_train(probs_test)
+gram_test = kernel.compute_gram_train(excitations_test)
 test_score = model.score(gram_test, y_test)
 
 print("Train acc:", train_score)
