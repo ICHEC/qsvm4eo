@@ -10,7 +10,7 @@ qubit_coords = comm.recv(source=0, tag=0)
 
 drive = qsvm4eo.generate_rydberg_hamiltonian(qubit_coords)
 
-duration = 660 # ns
+duration = 660  # ns
 duration /= 1000
 schedule = Schedule(drive=drive, tmax=duration)
 
