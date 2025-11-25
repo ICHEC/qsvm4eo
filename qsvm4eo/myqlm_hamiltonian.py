@@ -3,7 +3,6 @@ from qat.core import Observable, Term
 
 
 c6 = 865723.02  # (rad/µs)(µm)**6
-duration = 660  # ns
 amplitude = 2 * np.pi  # rad/µs
 
 
