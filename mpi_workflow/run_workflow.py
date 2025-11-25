@@ -1,7 +1,7 @@
 import qsvm4eo
 import numpy as np
 from mpi4py import MPI
-from sklean import SVC
+from sklearn.svm import SVC
 
 # Load the data
 num_features = 4
