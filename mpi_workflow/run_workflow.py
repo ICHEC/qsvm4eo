@@ -15,7 +15,7 @@ def compute_probabilities(qbits):
     # Recieve the state probabilities.
     probs = worker.recv(source=0, tag=1)
     print("Finished computing probabilities:")
-    print(probs_train.shape)
+    print(probs.shape)
 
     # Recieve the end signal
     end = worker.recv(source=0, tag=2)
