@@ -12,7 +12,7 @@ qubit_coords = comm.recv(source=0, tag=0)
 
 # Create jobs
 schedule = Schedule(
-    drive=qsvm4eo.generate_rydberg_hamiltonian(qubit_coords), tmax=0.66  # μs
+    drive=qsvm4eo.generate_myqlm_hamiltonian(qubit_coords), tmax=0.66  # μs
 )
 job = schedule.to_job()
 
