@@ -1,16 +1,16 @@
-import pandas as pd
+import qsvm4eo
 import numpy as np
-from features2qubits import RadialEncoding
 from mpi4py import MPI
 
 # load data
-data_train = pd.read_csv("../data/train_32.csv", header=0)
-features = ['B02', 'B03', 'B04', 'B08']
+num_features = 4
+x_train, y_train, x_test, y_test = qsvm4eo.load_data(
+    data_path="..", num_features=num_features, scale_features=False
+    )
 
-x_train = np.array(data_train[features].values, dtype=float)
-
-encoding = RadialEncoding(
-    max_feature=np.max(x_train), shift=1., scaling=5.4, n_features=len(features)
+# encode the data
+encoding = qsvm4eo.RadialEncoding(
+    max_feature=np.max(x_train), shift=1., scaling=5.4, n_features=len(num_features)
     )
 qbits0 = encoding.encode(x_train[0])
 
