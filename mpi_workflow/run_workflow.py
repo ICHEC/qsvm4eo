@@ -27,7 +27,7 @@ worker.send(qbits_train, dest=0, tag=0)
 # Recieve the state probabilities.
 probs_train = worker.recv(source=0, tag=1)
 print("Probabilities:")
-print(probs_train)
+print(probs_train.shape)
 
 # Recieve the end signal
 end = worker.recv(source=0, tag=2)
@@ -42,7 +42,7 @@ gram_train = kernel.compute_gram_train(probs_train)
 
 # Fit the SVM
 model = SVC(kernel="precomputed")
-model.fit(gram_train, y_train)
+model.fit(gram_train, y_train[:50])
 
 train_score = model.score(gram_train, y_train[:50])
 print("Train acc:", train_score)
