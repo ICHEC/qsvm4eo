@@ -1,8 +1,8 @@
 import qsvm4eo
 import numpy as np
+import json
 from mpi4py import MPI
 from sklearn.svm import SVC
-
 
 def compute_probabilities(qbits):
     # Create a worker for the quantum task
@@ -61,7 +61,17 @@ excitations_test = qsvm4eo.compute_excitation_count(probs_test)
 
 # Compute the kernel and score
 gram_test = kernel.compute_gram_train(excitations_test)
+y_test_pred = model.predict(gram_test)
 test_score = model.score(gram_test, y_test)
 
 print("Train acc:", train_score)
 print("Test acc:", test_score)
+
+results = {
+    "train_acc": train_score,
+    "test_acc": test_score,
+    "y_test_pred": y_test_pred
+    }
+
+with open('results.json', 'w') as fp:
+    json.dump(results, fp)
