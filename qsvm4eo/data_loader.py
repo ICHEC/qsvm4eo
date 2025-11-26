@@ -1,6 +1,8 @@
-import pandas as pd
+
 import numpy as np
+import pandas as pd
 from sklearn.preprocessing import StandardScaler
+
 
 
 def load_data(data_path, num_features, scale_features=False):
@@ -40,3 +42,5 @@ def load_data(data_path, num_features, scale_features=False):
         x_test = scaler.transform(x_test)
 
     return x_train, y_train, x_test, y_test
+
+

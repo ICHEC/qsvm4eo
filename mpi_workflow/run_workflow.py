@@ -2,8 +2,15 @@ import qsvm4eo
 import numpy as np
 import json
 import datetime
+import pandas as pd 
 from mpi4py import MPI
 from sklearn.svm import SVC
+import argparse 
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--encoding_type', type=str, default='radial', help="Type of encoding used")
+encoding_type = parser.parse_args().encoding_type
+
 
 
 def compute_probabilities(qbits):
@@ -29,20 +36,41 @@ def compute_probabilities(qbits):
 
 
 # Load the data
-num_features = 4
-x_train, y_train, x_test, y_test = qsvm4eo.load_data(
-    data_path="..", num_features=num_features, scale_features=False
-)
+if encoding_type == 'radial':
+    num_features = 4
+    x_train, y_train, x_test, y_test = qsvm4eo.load_data(
+        data_path="..", num_features=num_features, scale_features=False
+    )
+if encoding_type == 'convolutional':
+    df_train = pd.read_csv("./../data/train_32.csv")
+    df_test = pd.read_csv("./../data/test_32.csv")
+
+
+
 
 # Encode the data, transforming the features into qubit coordinates
-encoding = qsvm4eo.RadialEncoding(
-    max_feature=np.max(x_train), shift=1.0, scaling=5.4, n_features=num_features
-)
-qbits_train = [encoding.encode(x) for x in x_train]
-qbits_test = [encoding.encode(x) for x in x_test]
+if encoding_type == 'radial':
+    encoding = qsvm4eo.RadialEncoding(
+        max_feature=np.max(x_train), shift=1.0, scaling=5.4, n_features=num_features
+    )
+    qbits_train = [encoding.encode(x) for x in x_train]
+    qbits_test = [encoding.encode(x) for x in x_test]
+if encoding_type == 'convolutional':
+    encoding_train = qsvm4eo.ConvolutionalEncoding(
+        df_train
+    )
+    qbits_train, y_train = encoding_train.hsv_encoding(scaling=37)
+    encoding_test = qsvm4eo.ConvolutionalEncoding(
+        df_test
+    )
+    qbits_test, y_test = encoding_test.hsv_encoding(scaling=37)
+    
+
+
 
 print("Qubit Geometries:")
 print(qbits_train[:4])
+
 
 print("Training:")
 probs_train = compute_probabilities(qbits_train)
@@ -78,3 +106,5 @@ results = {
 
 with open("results.json", "w") as fp:
     json.dump(results, fp)
+
+    
