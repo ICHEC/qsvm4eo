@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.spatial import distance
-
+import math 
 
 class Kernel:
     """
@@ -36,6 +36,8 @@ class Kernel:
         for i in range(n_train - 1):
             for j in range(i + 1, n_train):
                 js = distance.jensenshannon(p_train[i], p_train[j]) ** 2.0
+                if math.isnan(js):
+                    js = 0
                 gram[i, j] = gram[j, i] = np.exp(-self.mu * js)
         return gram
 
@@ -62,6 +64,8 @@ class Kernel:
         for i in range(n_test):
             for j in range(n_train):
                 js = distance.jensenshannon(p_train[i], p_test[j]) ** 2.0
+                if math.isnan(js):
+                    js = 0
                 gram[i, j] = np.exp(-self.mu * js)
         return gram
 
