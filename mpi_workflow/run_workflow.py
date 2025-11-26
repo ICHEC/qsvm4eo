@@ -1,6 +1,7 @@
 import qsvm4eo
 import numpy as np
 import json
+import datetime
 from mpi4py import MPI
 from sklearn.svm import SVC
 
@@ -70,7 +71,8 @@ print("Test acc:", test_score)
 results = {
     "train_acc": train_score,
     "test_acc": test_score,
-    "y_test_pred": y_test_pred
+    "y_test_pred": y_test_pred,
+    "time": datetime.datetime.now().strftime("%A, %d. %B %Y %I:%M%p"),
     }
 
 with open('results.json', 'w') as fp:
