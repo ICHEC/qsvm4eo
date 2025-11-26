@@ -5,6 +5,7 @@ import datetime
 from mpi4py import MPI
 from sklearn.svm import SVC
 
+
 def compute_probabilities(qbits):
     # Create a worker for the quantum task
     worker = MPI.COMM_SELF.Spawn("python", "./qsvm_train.py", 1)
@@ -73,7 +74,7 @@ results = {
     "test_acc": test_score,
     "y_test_pred": y_test_pred,
     "time": datetime.datetime.now().strftime("%A, %d. %B %Y %I:%M%p"),
-    }
+}
 
-with open('results.json', 'w') as fp:
+with open("results.json", "w") as fp:
     json.dump(results, fp)
