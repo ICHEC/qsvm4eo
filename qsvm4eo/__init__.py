@@ -1,6 +1,5 @@
 __all__ = [
     "load_data",
-    "load_data_convolutional",
     "RadialEncoding",
     "ConvolutinalEncoding",
     "generate_myqlm_hamiltonian",
