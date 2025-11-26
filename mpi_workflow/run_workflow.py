@@ -72,7 +72,7 @@ print("Test acc:", test_score)
 results = {
     "train_acc": train_score,
     "test_acc": test_score,
-    "y_test_pred": y_test_pred,
+    "y_test_pred": y_test_pred.tolist(),
     "time": datetime.datetime.now().strftime("%A, %d. %B %Y %I:%M%p"),
 }
 
