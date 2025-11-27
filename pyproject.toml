@@ -18,6 +18,8 @@ dependencies = [
     "numpy",
     "scikit-learn",
     "matplotlib",
+    "myqlm",
+    "qutip",
 ]
 
 [tool.setuptools.package-dir]
