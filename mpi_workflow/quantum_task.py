@@ -8,7 +8,7 @@ from qat.core import Batch, Schedule
 comm = MPI.Comm.Get_parent()
 
 # Receive the qubit geometries
-qbits_train = comm.recv(source=0, tag=0)
+qbit_coords = comm.recv(source=0, tag=0)
 
 # Define the QPU
 my_qpu = AnalogQPU()
@@ -17,7 +17,7 @@ my_qpu = AnalogQPU()
 duration = 0.66  # μs
 schedules = [
     Schedule(drive=qsvm4eo.generate_myqlm_hamiltonian(qbits), tmax=duration)
-    for qbits in qbits_train
+    for qbits in qbit_coords
 ]
 jobs = [schedule.to_job() for schedule in schedules]
 
