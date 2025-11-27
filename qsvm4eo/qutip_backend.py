@@ -4,9 +4,9 @@ from .myqlm_hamiltonian import parameters
 
 c6 = parameters["c6"]
 amplitude = parameters["amplitude"]
+duration = 0.66  # μs
 
-
-def generate_qutip_hamiltonian(qbits):
+def _generate_qutip_hamiltonian(qbits):
     """Generate Rydberg Hamiltonian."""
     hamiltonian = 0.0
 
@@ -30,13 +30,46 @@ def generate_qutip_hamiltonian(qbits):
 
 
 class QutipBackend:
+    """
+    A QPU with a statevector emulator in Qutip.
+    """
     def run(self, qbit_coords):
-        hamiltonian = generate_qutip_hamiltonian(qbit_coords)
+        """
+        Run a simulator for a single qubit configuration.
+
+        Parameters
+        ----------
+        qbit_coords : np.ndarray
+            An np.ndarray of shape (N, 2) where N is the number of qubits,
+            specifying the qubit coordinates.
+
+        Returns
+        -------
+        np.ndarray
+            An array of length 2^N containing the state probabilities.
+        """
+        hamiltonian = _generate_qutip_hamiltonian(qbit_coords)
         intial_state = qutip.tensor([qutip.basis(2)] * len(qbit_coords))
-        evolved_state = qutip.sesolve(hamiltonian, intial_state, [0.0, 0.66])
+        evolved_state = qutip.sesolve(hamiltonian, intial_state, [0.0, duration])
         final_state = evolved_state.final_state.full()
         probs = np.real(np.conj(final_state) * final_state)
         return probs.flatten()
 
     def batch(self, qbits):
+        """
+        Run a simulator for a batch of qubit configurations.
+
+
+        Parameters
+        ----------
+        qbits : np.ndarray
+            An np.ndarray of shape (B, N, 2) where B is the number of
+            qubit configurations and N is the number of qubits, which
+            specifies the qubit coordinates.
+
+        Returns
+        -------
+        np.ndarray
+            An array of shape (B,2^N) containing the state probabilities.
+        """
         return np.array([self.run(q) for q in qbits])
