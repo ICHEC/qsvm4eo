@@ -60,7 +60,7 @@ print("Testing")
 excitations_test = compute_excitations(qbits_test)
 
 # Compute the kernel and score
-gram_test = kernel.compute_gram_test(excitations_test)
+gram_test = kernel.compute_gram_test(excitations_test, excitations_train)
 y_test_pred = model.predict(gram_test)
 test_score = model.score(gram_test, y_test)
 
@@ -75,5 +75,5 @@ results = {
     "time": datetime.datetime.now().strftime("%A, %d. %B %Y %I:%M%p"),
 }
 
-with open("results.json", "w") as fp:
+with open(f"results_{job_id}.json", "w") as fp:
     json.dump(results, fp)
