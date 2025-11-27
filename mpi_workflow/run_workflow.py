@@ -13,9 +13,9 @@ encoding_type = parser.parse_args().encoding_type
 
 
 
-def compute_probabilities(qbits):
+def compute_excitations(qbits):
     # Create a worker for the quantum task
-    worker = MPI.COMM_SELF.Spawn("python", "./qsvm_train.py", 1)
+    worker = MPI.COMM_SELF.Spawn("python", "./quantum_task.py", 1)
 
     # Send the qubit geometries
     print("Computing probabilities")
@@ -32,7 +32,7 @@ def compute_probabilities(qbits):
 
     # disconnect from worker
     worker.Disconnect()
-    return probs
+    return qsvm4eo.compute_excitation_count(probs)
 
 
 # Load the data
@@ -73,24 +73,20 @@ print(qbits_train[:4])
 
 
 print("Training:")
-probs_train = compute_probabilities(qbits_train)
-excitations_train = qsvm4eo.compute_excitation_count(probs_train)
+excitations_train = compute_excitations(qbits_train)
 
-# Compute the kernel
+# Fit the SVM and get the score
 kernel = qsvm4eo.Kernel()
-gram_train = kernel.compute_gram_train(excitations_train)
-
-# Fit the SVM ad get the score
+gram_train = kernel.compute_gram_train(excitations_train)  # Compute the kernel
 model = SVC(kernel="precomputed")
 model.fit(gram_train, y_train)
 train_score = model.score(gram_train, y_train)
 
 print("Testing")
-probs_test = compute_probabilities(qbits_test)
-excitations_test = qsvm4eo.compute_excitation_count(probs_test)
+excitations_test = compute_excitations(qbits_test)
 
 # Compute the kernel and score
-gram_test = kernel.compute_gram_train(excitations_test)
+gram_test = kernel.compute_gram_test(excitations_test, excitations_train)
 y_test_pred = model.predict(gram_test)
 test_score = model.score(gram_test, y_test)
 
@@ -100,11 +96,10 @@ print("Test acc:", test_score)
 results = {
     "train_acc": train_score,
     "test_acc": test_score,
-    "y_test_pred": y_test_pred.tolist(),
+    "labels_pred": y_test_pred.tolist(),
+    "labels_true": y_test.tolist(),
     "time": datetime.datetime.now().strftime("%A, %d. %B %Y %I:%M%p"),
 }
-
 with open("results.json", "w") as fp:
     json.dump(results, fp)
-
     
