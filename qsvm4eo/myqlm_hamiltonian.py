@@ -1,9 +1,13 @@
 import numpy as np
 from qat.core import Observable, Term
 
+parameters = {
+    "c6": 865723.02,  # (rad/µs)(µm)**6
+    "amplitude": 2 * np.pi,  # rad/µs
+}
 
-c6 = 865723.02  # (rad/µs)(µm)**6
-amplitude = 2 * np.pi  # rad/µs
+c6 = parameters["c6"]
+amplitude = parameters["amplitude"]
 
 
 def generate_myqlm_hamiltonian(qbits):

@@ -8,6 +8,7 @@ from sklearn.svm import SVC
 
 _, job_id = sys.argv
 
+
 def compute_excitations(qbits):
     # Create a worker for the quantum task
     worker = MPI.COMM_SELF.Spawn("python", "./quantum_task.py", 1)
