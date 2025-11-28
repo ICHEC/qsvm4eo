@@ -33,7 +33,7 @@ def compute_excitations(qbits):
 
 # Load the data
 num_features = 4
-x_train, y_train, x_test, y_test = qsvm4eo.load_data(
+x_train, y_train, x_test, y_test, _ = qsvm4eo.load_data(
     data_path="..", num_features=num_features, scale_features=False
 )
 
