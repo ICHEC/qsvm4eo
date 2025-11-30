@@ -1,5 +1,4 @@
 import numpy as np
-from scipy.spatial import distance
 
 
 class Kernel:
@@ -35,8 +34,7 @@ class Kernel:
 
         for i in range(n_train - 1):
             for j in range(i + 1, n_train):
-                js = distance.jensenshannon(p_train[i], p_train[j]) ** 2.0
-                gram[i, j] = gram[j, i] = np.exp(-self.mu * js)
+                gram[i, j] = gram[j, i] = _distance(p_train[i], p_train[j], self.mu)
         return gram
 
     def compute_gram_test(self, p_test, p_train):
@@ -45,7 +43,7 @@ class Kernel:
 
         Parameters
         ----------
-        p_train : np.ndarray
+        p_test : np.ndarray
             The probability distributions for the test data.
         p_train : np.ndarray
             The probability distributions for the training data.
@@ -61,10 +59,12 @@ class Kernel:
 
         for i in range(n_test):
             for j in range(n_train):
-                js = distance.jensenshannon(p_train[i], p_test[j]) ** 2.0
-                gram[i, j] = np.exp(-self.mu * js)
+                gram[i, j] = _distance(p_train[i], p_test[j], self.mu)
         return gram
 
+
+def _distance(p1, p2, mu):
+    return np.exp(-mu * np.abs(p1-p2).sum())
 
 def compute_excitation_count(probs):
     """Compute the number of excitations from the state probabilities."""
