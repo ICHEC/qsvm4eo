@@ -44,7 +44,7 @@ def compute_distributions(qbits, excitations=True):
 
 # Load the data
 print("Loading the data")
-x_train, y_train, x_test, y_test, _ = qsvm4eo.load_data(
+x_train, y_train, x_test, y_test, label_names = qsvm4eo.load_data(
     data_path="..", num_features=args.num_features, scale_features=False
 )
 
@@ -89,6 +89,7 @@ results = {
     "test_acc": test_score,
     "labels_pred": y_test_pred.tolist(),
     "labels_true": y_test.tolist(),
+    "label_names": label_names,
     "time": datetime.datetime.now().strftime("%A, %d. %B %Y %I:%M%p"),
 }
 
