@@ -5,6 +5,7 @@ from .myqlm_hamiltonian import parameters
 c6 = parameters["c6"]
 amplitude = parameters["amplitude"]
 
+
 def _generate_qutip_hamiltonian(qbits):
     """Generate Rydberg Hamiltonian."""
     hamiltonian = 0.0
@@ -37,6 +38,7 @@ class QutipBackend:
     duration : float
         The time in μs to evolve the system. Defaults to 0.66.
     """
+
     def __init__(self, duration=0.66):
         self.duration = duration
 

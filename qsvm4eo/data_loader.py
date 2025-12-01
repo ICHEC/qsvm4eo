@@ -16,7 +16,7 @@ def load_data(data_path, num_features, scale_features=False):
     scale_features : bool
         Whether to scale the features such that the mean
         is 0 and variance is 1. Defaults to False.
-    
+
     Returns
     -------
     tuple
@@ -27,7 +27,7 @@ def load_data(data_path, num_features, scale_features=False):
         1: "Urban",
         2: "Agricultural",
         3: "Forests/natural",
-        }
+    }
 
     if num_features == 4:
         features = ["B02", "B03", "B04", "B08"]
@@ -52,4 +52,3 @@ def load_data(data_path, num_features, scale_features=False):
         x_test = scaler.transform(x_test)
 
     return x_train, y_train, x_test, y_test, label_names
-    

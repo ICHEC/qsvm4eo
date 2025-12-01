@@ -64,7 +64,8 @@ class Kernel:
 
 
 def _distance(p1, p2, mu):
-    return np.exp(-mu * np.abs(p1-p2).sum())
+    return np.exp(-mu * np.abs(p1 - p2).sum())
+
 
 def compute_excitation_count(probs):
     """Compute the number of excitations from the state probabilities."""

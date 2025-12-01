@@ -42,6 +42,7 @@ def compute_distributions(qbits, excitations=True):
     else:
         return probs
 
+
 # Load the data
 print("Loading the data")
 x_train, y_train, x_test, y_test, label_names = qsvm4eo.load_data(
