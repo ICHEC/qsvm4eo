@@ -1,7 +1,9 @@
 import collections as col
 import random as rd
 
-import numpy as np 
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 
 
 def normalise_array(x, n=1, axis=0):
@@ -51,3 +53,102 @@ def majority_vote(x, seed=24041916):
     ties = [k for k, v in counts.items() if v == max_count]
     most_common_value = rd.choice(ties)
     return int(most_common_value)
+
+
+def plot_label_grid_with_points(
+    df,
+    label_col="Label",
+    lat_col="lat_rank",
+    lon_col="lon_rank",
+    label_names=None,
+    cmap_name="tab10",
+    point_color="black",
+    point_size=20,
+    figsize=(8, 8),
+    legend_loc="upper left",
+    draw_squares=False,
+    n_convoluted_side=2,
+):
+    """
+    Plots a categorical label grid with overlaid scatter points.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        DataFrame containing label, lat_rank, and lon_rank columns.
+    label_col : str
+        Name of the column containing label values.
+    lat_col : str
+        Name of the column containing latitude ranks.
+    lon_col : str
+        Name of the column containing longitude ranks.
+    label_names : list of str
+        Names of the categories, in the order of numeric labels.
+    cmap_name : str
+        Name of the matplotlib colormap to use for categories.
+    point_color : str
+        Color of the scatter points.
+    point_size : int
+        Size of the scatter points.
+    figsize : tuple
+        Figure size.
+    legend_loc : str
+        Location of the legend.
+    """
+    # Prepare the label grid
+    num_points_per_side = int(np.sqrt(len(df)))  # assumes square grid
+    label_grid = (
+        df[label_col].to_numpy().reshape(num_points_per_side, num_points_per_side)
+    )
+
+    # Map labels to colors
+    cmap = plt.get_cmap(cmap_name)
+    num_labels = int(df[label_col].max())  # assumes labels start at 1
+    colors = [cmap(i) for i in range(num_labels)]
+    color_indices = label_grid - 1  # map label 1->0, 2->1, etc.
+
+    # Plot the grid
+    plt.figure(figsize=figsize)
+    plt.imshow(
+        color_indices, origin="lower", cmap=plt.matplotlib.colors.ListedColormap(colors)
+    )
+    plt.xlabel("Longitude Rank")
+    plt.ylabel("Latitude Rank")
+    plt.title("Label Grid")
+
+    # Add legend
+    if label_names is None:
+        label_names = [f"Label {i+1}" for i in range(num_labels)]
+    legend_handles = [
+        mpatches.Patch(color=colors[i], label=label_names[i]) for i in range(num_labels)
+    ]
+    plt.legend(handles=legend_handles, loc=legend_loc)
+
+    # Scatter points
+    lat = df[lat_col].to_numpy()
+    lon = df[lon_col].to_numpy()
+    plt.scatter(lon, lat, color=point_color, s=point_size, edgecolor="white")
+
+    if draw_squares:
+        # Draw squares only around non-empty blocks
+        for i in range(0, num_points_per_side, n_convoluted_side):
+            for j in range(0, num_points_per_side, n_convoluted_side):
+                # Find points in current block
+                mask = (
+                    (lat >= i)
+                    & (lat < i + n_convoluted_side)
+                    & (lon >= j)
+                    & (lon < j + n_convoluted_side)
+                )
+                # Draw square around the block
+                rect = mpatches.Rectangle(
+                    (j, i),  # bottom-left corner
+                    n_convoluted_side - 1,
+                    n_convoluted_side - 1,
+                    linewidth=2,
+                    edgecolor="black",
+                    facecolor="none",
+                )
+                plt.gca().add_patch(rect)
+
+    plt.show()

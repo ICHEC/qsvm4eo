@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.spatial import distance
-import math 
+import math
+
 
 class Kernel:
     """

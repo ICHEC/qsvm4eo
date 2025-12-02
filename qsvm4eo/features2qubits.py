@@ -1,7 +1,7 @@
 import numpy as np
 import qsvm4eo
 import skimage as ski
-import scipy as scp 
+import scipy as scp
 
 
 class RadialEncoding:
@@ -34,14 +34,31 @@ class RadialEncoding:
         """
         radius = x * self.scaling + self.shift
         return radius[:, None] * self.unit_circle
-    
+
 
 class ConvolutionalEncoding:
     """
-    Class for implementing the ConvolutionalEncoding
+    Class for implementing the ConvolutionalEncoding.
+
+    In this encoding, all datapoints are first placed on a grid according to their latitudes and longitudes.
+    We then convolve the points in square blocks of size 2 ** n_convoluted_side. Each block becomes a graph
+    that will be used as input to the analog QC.
+
+    To assign coordinates to the nodes of each graph, we convert the RGB values associated with each node
+    into HSV (Hue, Saturation, Value). The Hue component (H), interpreted as an angle, is then used to generate
+    the Cartesian coordinates of each node in the graph. We apply scaling factors to the radial component of the
+    polar coordinates and include angle offsets to ensure that the resulting embeddings are compatible with the QC system.
     """
+
     def __init__(self, df):
-        self.df = df 
+        """
+
+        Parameters
+        ----------
+        df : pd.DataFrame
+            A dataset containing (at least) the following columns ['Label', 'Latitude', 'Longitude', 'B02', 'B03', 'B04']:
+        """
+        self.df = df
         self.colour_transformation()
         self.rank_sort_coordinates()
 
@@ -49,23 +66,27 @@ class ConvolutionalEncoding:
         """
         Transforms our RGB coordinates to HSV coordinates
         """
-        rgb_coordinates = qsvm4eo.normalise_array(self.df[["B04", "B03", "B02"]].to_numpy())
+        rgb_coordinates = qsvm4eo.normalise_array(
+            self.df[["B04", "B03", "B02"]].to_numpy()
+        )
         ## Colour transformation. We add a new dimension to fit in the skimage input.
-        hsv_coordinates = ski.color.rgb2hsv(rgb_coordinates[np.newaxis, :, :])[0] 
+        hsv_coordinates = ski.color.rgb2hsv(rgb_coordinates[np.newaxis, :, :])[0]
         self.df["hsv_coordinates"] = list(hsv_coordinates)
 
     def rank_sort_coordinates(self):
         """
         Ranks and sorts coordinates so that we have values between
         0 and N - 1 being N the number of points in our dataset.
-        The dataset will be ordered with values depending on 
-        latitude and longitude. 
+        The dataset will be ordered with values depending on
+        latitude and longitude.
         """
-        self.df["lat_rank"] = scp.stats.rankdata(self.df["Latitude"], method="dense") - 1
-        self.df["lon_rank"] = scp.stats.rankdata(self.df["Longitude"], method="dense") - 1
-        self.df.sort_values( 
-            by=["lat_rank", "lon_rank"], inplace=True
+        self.df["lat_rank"] = (
+            scp.stats.rankdata(self.df["Latitude"], method="dense") - 1
         )
+        self.df["lon_rank"] = (
+            scp.stats.rankdata(self.df["Longitude"], method="dense") - 1
+        )
+        self.df.sort_values(by=["lat_rank", "lon_rank"], inplace=True)
 
     def convolute_in_squares(self, n_convoluted_side=2):
         """
@@ -98,26 +119,21 @@ class ConvolutionalEncoding:
         self.convoluted_coordinates = np.stack(convoluted_coordinates)
         self.convoluted_labels = convoluted_labels
 
-    
     def hsv_encoding(self, n_convoluted_side=2, scaling=1):
         self.convolute_in_squares(n_convoluted_side=n_convoluted_side)
         N, M, _ = self.convoluted_coordinates.shape
-        unit_circle_division = (2 * np.pi) / (n_convoluted_side ** 2 * 2)
-        angles_normalised = np.mod(self.convoluted_coordinates[:, :, 0], unit_circle_division)
+        unit_circle_division = (2 * np.pi) / (n_convoluted_side**2 * 2)
+        angles_normalised = np.mod(
+            self.convoluted_coordinates[:, :, 0], unit_circle_division
+        )
         # Compute offsets for the angles
         offsets = 2 * np.arange(n_convoluted_side**2) * unit_circle_division
         offsets = offsets[:M]
         # Apply offsets
         angles_divided = angles_normalised + offsets
-        
+
         # Convert to Cartesian coordinates
         x = scaling * np.cos(angles_divided)
         y = scaling * np.sin(angles_divided)
         hsv_coordinates = np.stack((x, y), axis=2)
         return hsv_coordinates, self.convoluted_labels
-
-
-
-
-
-
