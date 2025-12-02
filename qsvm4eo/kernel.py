@@ -3,8 +3,8 @@ import numpy as np
 
 class Kernel:
     """
-    Class for computing gram matrices based on the Jensen-Shannon
-    divergence between probability distributions.
+    Class for computing gram matrices based on similarity of
+    the probability distributions.
 
     Parameters
     ----------
@@ -73,8 +73,7 @@ def compute_excitation_count(probs):
     excitations = np.zeros((probs.shape[0], num_features + 1))
 
     for i in range(2**num_features):
-        n_excit = np.binary_repr(i, num_features).count(
-            "1"
-        )  # the number of excitations
+        # the number of excitations
+        n_excit = np.binary_repr(i, num_features).count("1")
         excitations[:, n_excit] += probs[:, i]
     return excitations

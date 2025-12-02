@@ -7,7 +7,7 @@ amplitude = parameters["amplitude"]
 
 
 def _generate_qutip_hamiltonian(qbits):
-    """Generate Rydberg Hamiltonian."""
+    """Generate the Rydberg Hamiltonian."""
     hamiltonian = 0.0
 
     nqbits = len(qbits)
