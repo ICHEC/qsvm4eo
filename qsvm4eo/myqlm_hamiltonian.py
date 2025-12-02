@@ -11,7 +11,15 @@ amplitude = parameters["amplitude"]
 
 
 def generate_myqlm_hamiltonian(qbits):
-    """Generate Rydberg Hamiltonian."""
+    """
+    Generate the Rydberg Hamiltonian.
+
+    Parameters
+    ----------
+    qbits : np.ndarray
+        An np.ndarray of shape (N, 2) where N is the number of qubits,
+        specifying the qubit coordinates.
+    """
     nqbits = len(qbits)
 
     amplitude_term = Observable(

@@ -4,10 +4,10 @@ from .myqlm_hamiltonian import parameters
 
 c6 = parameters["c6"]
 amplitude = parameters["amplitude"]
-duration = 0.66  # μs
+
 
 def _generate_qutip_hamiltonian(qbits):
-    """Generate Rydberg Hamiltonian."""
+    """Generate the Rydberg Hamiltonian."""
     hamiltonian = 0.0
 
     nqbits = len(qbits)
@@ -32,7 +32,16 @@ def _generate_qutip_hamiltonian(qbits):
 class QutipBackend:
     """
     A QPU with a statevector emulator in Qutip.
+
+    Parameters
+    ----------
+    duration : float
+        The time in μs to evolve the system. Defaults to 0.66.
     """
+
+    def __init__(self, duration=0.66):
+        self.duration = duration
+
     def run(self, qbit_coords):
         """
         Run a simulator for a single qubit configuration.
@@ -50,7 +59,7 @@ class QutipBackend:
         """
         hamiltonian = _generate_qutip_hamiltonian(qbit_coords)
         intial_state = qutip.tensor([qutip.basis(2)] * len(qbit_coords))
-        evolved_state = qutip.sesolve(hamiltonian, intial_state, [0.0, duration])
+        evolved_state = qutip.sesolve(hamiltonian, intial_state, [0.0, self.duration])
         final_state = evolved_state.final_state.full()
         probs = np.real(np.conj(final_state) * final_state)
         return probs.flatten()
@@ -58,7 +67,6 @@ class QutipBackend:
     def batch(self, qbits):
         """
         Run a simulator for a batch of qubit configurations.
-
 
         Parameters
         ----------
