@@ -14,6 +14,8 @@ pip install .
 ### Earth Observation Data
 
 ### Analogue Quantum Kernel
-The quantum kernel computed here is designed for analgue quantum computers, a common choice of modality for implementing this is neutral atom quantum computers. The main idea here (as developed by Henry et al.) is to encode the feature vector data into the positions and topology of the qubits. As we are dealing with data which is not in a natural graph format we must introduce an encoding scheme as discussed below. A constant pulse is applied to the system and it is left to evolve up to some specfied time. The states of the qubits are then measured and from this a probability distribution can be constructed (for example the distribution of the total number of excitations). Using a probability similarity measure, for example the Jensen–Shannon divergence, the similarity between the distributions can be computed and a suitable kernel for a SVM can be created.
+The quantum kernel computed here is designed for analgue quantum computers, a common choice of modality for implementing this is neutral atom quantum computers. The main idea here (as developed by Henry et al.) is to encode the feature vector data into the positions and topology of the qubits. As we are dealing with data which is not in a natural graph format we must introduce an encoding scheme as discussed below. A constant pulse is applied to the system and it is left to evolve up to some specfied time. The states of the qubits are then measured and from this a probability distribution can be constructed (for example the distribution of the total number of excitations). Using a probability similarity measure, for example the Jensen–Shannon divergence, the similarity between the distributions can be computed and a suitable kernel for a SVM can be created. The full workflow is shown in the diagram below.
+
+![alt text](diagram/diagram.png "Title")
 
 ### Encoding Strategies
