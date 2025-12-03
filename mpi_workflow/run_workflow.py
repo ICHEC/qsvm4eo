@@ -8,26 +8,14 @@ from sklearn.svm import SVC
 import argparse
 
 parser = argparse.ArgumentParser()
+parser.add_argument("-o", "--output_name", type=str, default="results")
 parser.add_argument(
-    "--encoding_type", type=str, default="radial", help="Type of encoding used"
-)
-encoding_type = parser.parse_args().encoding_type
-
-import argparse
-
-parser = argparse.ArgumentParser()
-parser.add_argument("-o", "--output_name", type=str, default="results")
+    "-enc", "--encoding_type", type=str, default="radial", choices=["radial", "convolutional"], help="Type of encoding used")
 parser.add_argument("-nfeat", "--num_features", type=int, choices=[4, 8], default=4)
 parser.add_argument("-reg", "--regularization", type=float, default=1.0)
+parser.add_argument("-sca", "--conv_scaling", type=float, default=37.0)
 args = parser.parse_args()
 
-import argparse
-
-parser = argparse.ArgumentParser()
-parser.add_argument("-o", "--output_name", type=str, default="results")
-parser.add_argument("-nfeat", "--num_features", type=int, choices=[4, 8], default=4)
-parser.add_argument("-reg", "--regularization", type=float, default=1.0)
-args = parser.parse_args()
 
 
 def compute_distributions(qbits, excitations=True):
@@ -60,29 +48,33 @@ def compute_distributions(qbits, excitations=True):
 
 
 # Load the data
-if encoding_type == "radial":
-    num_features = 4
-    x_train, y_train, x_test, y_test = qsvm4eo.load_data(
-        data_path="..", num_features=num_features, scale_features=False
+if args.encoding_type == "radial":
+    x_train, y_train, x_test, y_test, label_names = qsvm4eo.load_data(
+        data_path="..", num_features=args.num_features, scale_features=False
     )
-if encoding_type == "convolutional":
+if args.encoding_type == "convolutional":
     df_train = pd.read_csv("./../data/train_32.csv")
     df_test = pd.read_csv("./../data/test_32.csv")
+    label_names = {
+        1: "Urban",
+        2: "Agricultural",
+        3: "Forests/natural",
+    }
 
 
 print("Encoding the data into qubits")
 # Encode the data, transforming the features into qubit coordinates
-if encoding_type == "radial":
+if args.encoding_type == "radial":
     encoding = qsvm4eo.RadialEncoding(
-        max_feature=np.max(x_train), shift=1.0, scaling=5.4, n_features=num_features
+        max_feature=np.max(x_train), shift=1.0, scaling=5.4, n_features=args.num_features
     )
     qbits_train = [encoding.encode(x) for x in x_train]
     qbits_test = [encoding.encode(x) for x in x_test]
-if encoding_type == "convolutional":
+if args.encoding_type == "convolutional":
     encoding_train = qsvm4eo.ConvolutionalEncoding(df_train)
-    qbits_train, y_train = encoding_train.hsv_encoding(scaling=37)
+    qbits_train, y_train = encoding_train.hsv_encoding(scaling=args.conv_scaling)
     encoding_test = qsvm4eo.ConvolutionalEncoding(df_test)
-    qbits_test, y_test = encoding_test.hsv_encoding(scaling=37)
+    qbits_test, y_test = encoding_test.hsv_encoding(scaling=args.conv_scaling)
 
 
 print("Qubit Geometries:")
@@ -113,12 +105,14 @@ print("Train acc:", train_score)
 print("Test acc:", test_score)
 
 results = {
+    "type_of_encoding": args.encoding_type,
     "number_of_features": args.num_features,
     "regularization": args.regularization,
+    "convolutional_scaling": args.conv_scaling,
     "train_acc": train_score,
     "test_acc": test_score,
     "labels_pred": y_test_pred.tolist(),
-    "labels_true": y_test.tolist(),
+    "labels_true": y_test.tolist() if args.encoding_type=="radial" else y_test,
     "label_names": label_names,
     "time": datetime.datetime.now().strftime("%A, %d. %B %Y %I:%M%p"),
 }
