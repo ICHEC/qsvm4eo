@@ -120,7 +120,7 @@ class ConvolutionalEncoding:
         Parameters
         ----------
         n_convoluted_side : int
-            Number of points on each side of the square.
+            Number of points on each side of the square. (default is 2)
         """
         n_grid_side = max(
             self.df["lat_rank"] + 1
@@ -144,7 +144,26 @@ class ConvolutionalEncoding:
         self.convoluted_coordinates = np.stack(convoluted_coordinates)
         self.convoluted_labels = convoluted_labels
 
-    def hsv_encoding(self, n_convoluted_side=2, scaling=1):
+    def hsv_encoding(self, n_convoluted_side=2, scaling=37.0):
+        """
+        Computes the coordinates of the nodes of each of the graphs in the dataset. 
+        It does so by assigning one angle to each of the nodes. This angle
+        will be the HUE angle plus an offset factor so that our graphs are embeddable 
+        in the analog device. Then we use those angles to change from polar 
+        to cartesian coordinates. 
+
+        Parameters
+        ----------
+        n_convoluted_side : int
+            Number of points on each side of the square (default is 2).
+        scaling : float
+            Radial coordinate to apply to our coordinates. (default is 37).
+
+        Returns
+        -------
+        list[np.ndarray]
+            A list containing arrays with the graphs coordinates and labels. 
+        """
         self.convolute_in_squares(n_convoluted_side=n_convoluted_side)
         N, M, _ = self.convoluted_coordinates.shape
         unit_circle_division = (2 * np.pi) / (n_convoluted_side**2 * 2)
