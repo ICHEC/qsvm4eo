@@ -1,13 +1,25 @@
 import numpy as np
 from qat.core import Observable, Term
 
+parameters = {
+    "c6": 865723.02,  # (rad/µs)(µm)**6
+    "amplitude": 2 * np.pi,  # rad/µs
+}
 
-c6 = 865723.02  # (rad/µs)(µm)**6
-amplitude = 2 * np.pi  # rad/µs
+c6 = parameters["c6"]
+amplitude = parameters["amplitude"]
 
 
 def generate_myqlm_hamiltonian(qbits):
-    """Generate Rydberg Hamiltonian."""
+    """
+    Generate the Rydberg Hamiltonian.
+
+    Parameters
+    ----------
+    qbits : np.ndarray
+        An np.ndarray of shape (N, 2) where N is the number of qubits,
+        specifying the qubit coordinates.
+    """
     nqbits = len(qbits)
 
     amplitude_term = Observable(
