@@ -13,7 +13,7 @@ parser.add_argument(
     "-enc", "--encoding_type", type=str, default="radial", choices=["radial", "convolutional"], help="Type of encoding used")
 parser.add_argument("-nfeat", "--num_features", type=int, choices=[4, 8], default=4)
 parser.add_argument("-reg", "--regularization", type=float, default=1.0)
-parser.add_argument("-sca", "--conv_scaling", type=float, default=37.0)
+parser.add_argument("-conv_sca", "--conv_scaling", type=float, default=37.0)
 args = parser.parse_args()
 
 

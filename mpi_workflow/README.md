@@ -16,9 +16,11 @@ srun -n 1 python run_workflow.py
 ```
 
 The `run_workflow.py` script takes the following optional arguemnts
-- `-o` the name of the output file (defaults to `results`)
-- `-nfeat` the number of features to use (either 4 or 8, defaults to 4)
+- `-o` the name of the output file (defaults to `results`).
+- `-enc` the encoding type to use in the computations (defaults to radial).
+- `-nfeat` the number of features to use (either 4 or 8, defaults to 4).
 - `-reg` the regularization parameter (defaults to 1.0).
+- `-conv_sca` the raidus or scaling used in convolutional encoding (defaults to 37.0).
 
 The results are saved in a `json` the specified name, in the `run.sh` script we use the `job_id`.
 The file contains:
