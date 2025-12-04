@@ -20,6 +20,9 @@ dependencies = [
     "matplotlib",
     "myqlm",
     "qutip",
+    "scipy",
+    "scikit-image",
+    
 ]
 
 [tool.setuptools.package-dir]
