@@ -1,7 +1,8 @@
 __all__ = [
     "load_data",
-    "RadialEncoding",
-    "ConvolutionalEncoding",
+    "RadialEmbedding",
+    "ConvolutionalEmbedding",
+    "GeneticEmbedding",
     "generate_myqlm_hamiltonian",
     "Kernel",
     "compute_excitation_count",
@@ -13,7 +14,9 @@ __all__ = [
 ]
 
 from .data_loader import load_data
-from .features2qubits import RadialEncoding, ConvolutionalEncoding
+from .embeddings.radial_embedding import RadialEmbedding
+from .embeddings.convolutional_embedding import ConvolutionalEmbedding
+from .embeddings.genetic_embedding import GeneticEmbedding
 from .myqlm_hamiltonian import generate_myqlm_hamiltonian
 from .kernel import Kernel, compute_excitation_count
 from .qutip_backend import QutipBackend
