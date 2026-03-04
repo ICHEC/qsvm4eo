@@ -1,5 +1,6 @@
-import qutip
 import numpy as np
+import qutip
+
 from .myqlm_hamiltonian import parameters
 
 c6 = parameters["c6"]

@@ -1,4 +1,5 @@
 import numpy as np
+
 import qsvm4eo
 
 

@@ -1,11 +1,13 @@
-import qsvm4eo
-import numpy as np
-import json
+import argparse
 import datetime
+import json
+
+import numpy as np
 import pandas as pd
 from mpi4py import MPI
 from sklearn.svm import SVC
-import argparse
+
+import qsvm4eo
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-o", "--output_name", type=str, default="results")

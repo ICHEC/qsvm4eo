@@ -1,9 +1,10 @@
 import collections as col
 import random as rd
 
-import numpy as np
-import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.spatial.distance import pdist
 
 
 def normalise_array(x, n=1, axis=0):
@@ -179,7 +180,6 @@ def check_embeddability(
     dict[int, dict[int, str]]
         Dictionary mapping graph index to its violated constraints.
         Empty dict means all graphs are embeddable.
-        Example: {3: {1: "atom too far from origin", 2: "atoms too close together"}}
     """
     failed_clauses = {}
     for i, g in enumerate(graph_list):

@@ -1,7 +1,8 @@
 import numpy as np
-import qsvm4eo
 import scipy as scp
 import skimage as ski
+
+import qsvm4eo
 
 
 class ConvolutionalEmbedding:

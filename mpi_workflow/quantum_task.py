@@ -1,8 +1,9 @@
 import numpy as np
-import qsvm4eo
 from mpi4py import MPI
-from qlmaas.qpus import AnalogQPU
 from qat.core import Batch, Schedule
+from qlmaas.qpus import AnalogQPU
+
+import qsvm4eo
 
 # Get the parent node
 comm = MPI.Comm.Get_parent()
