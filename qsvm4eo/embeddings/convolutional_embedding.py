@@ -1,7 +1,8 @@
-import numpy as np 
+import numpy as np
 import qsvm4eo
 import scipy as scp
 import skimage as ski
+
 
 class ConvolutionalEmbedding:
     """
@@ -88,11 +89,11 @@ class ConvolutionalEmbedding:
 
     def hsv_embedding(self, n_convoluted_side=2, scaling=37.0):
         """
-        Computes the coordinates of the nodes of each of the graphs in the dataset. 
+        Computes the coordinates of the nodes of each of the graphs in the dataset.
         It does so by assigning one angle to each of the nodes. This angle
-        will be the HUE angle plus an offset factor so that our graphs are embeddable 
-        in the analog device. Then we use those angles to change from polar 
-        to cartesian coordinates. 
+        will be the HUE angle plus an offset factor so that our graphs are embeddable
+        in the analog device. Then we use those angles to change from polar
+        to cartesian coordinates.
 
         Parameters
         ----------
@@ -104,7 +105,7 @@ class ConvolutionalEmbedding:
         Returns
         -------
         list[np.ndarray]
-            A list containing arrays with the graphs coordinates and labels. 
+            A list containing arrays with the graphs coordinates and labels.
         """
         self.convolute_in_squares(n_convoluted_side=n_convoluted_side)
         N, M, _ = self.convoluted_coordinates.shape

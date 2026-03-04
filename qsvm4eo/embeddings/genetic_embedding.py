@@ -1,5 +1,6 @@
-import numpy as np 
+import numpy as np
 import qsvm4eo
+
 
 class GeneticEmbedding:
     """
@@ -7,22 +8,23 @@ class GeneticEmbedding:
 
     In this embedding, each graph is generated using a genetic algorithm.
     The genetic algorithm optimises the node positions so that each graph has
-    as much similarity as possible to the original datapoints and the device 
-    constraints are being verified. 
+    as much similarity as possible to the original datapoints and the device
+    constraints are being verified.
     """
+
     def __init__(self, df):
         """
         Parameters
         ----------
         df : pd.DataFrame
         A dataset containing (at least) the following columns
-        ['Label', 'B02', 'B03', 'B04', 'B08']   
+        ['Label', 'B02', 'B03', 'B04', 'B08']
         """
         self.max_radius = 38.0
         self.k = 4
         self.d_min = 5.0
         self.df = df
-        B0x = df[['B02', 'B03', 'B04', 'B08']].to_numpy()
+        B0x = df[["B02", "B03", "B04", "B08"]].to_numpy()
         self.B0_norm = qsvm4eo.utils.normalise_array(B0x, self.max_radius)
 
     def init_population(self, pop_size):
@@ -44,9 +46,8 @@ class GeneticEmbedding:
         theta = np.random.rand(pop_size, self.k) * 2 * np.pi
         x = r * np.cos(theta)
         y = r * np.sin(theta)
-        coords = np.stack((x,y), axis=2)
-        return coords 
-
+        coords = np.stack((x, y), axis=2)
+        return coords
 
     def fitness(self, ind, idx, alpha):
         """
@@ -78,15 +79,19 @@ class GeneticEmbedding:
 
         # 2. Between-nodes distance penalty.
         diff = ind[:, None, :] - ind[None, :, :]
-        dists = np.linalg.norm(diff, axis=-1)  
+        dists = np.linalg.norm(diff, axis=-1)
         i, j = np.triu_indices(self.k, k=1)
-        penalty_distance_nodes = np.sum(np.maximum(0.0, self.d_min - dists[i,j]))
+        penalty_distance_nodes = np.sum(np.maximum(0.0, self.d_min - dists[i, j]))
 
         # 3. bands-norm penalty
         penalty_bands_norm = np.sum(np.abs(self.B0_norm[idx] - norm))
 
-        return -(alpha[0] * penalty_norm + alpha[1] * penalty_distance_nodes + alpha[2] * penalty_bands_norm)
-    
+        return -(
+            alpha[0] * penalty_norm
+            + alpha[1] * penalty_distance_nodes
+            + alpha[2] * penalty_bands_norm
+        )
+
     def tournament_selection(self, pop, fit, n, k_tourn=3):
         """
         Perform tournament selection.
@@ -142,17 +147,17 @@ class GeneticEmbedding:
                 if abs(parent1[i] - parent2[i]) > 1e-14:
                     x1, x2 = min(parent1[i], parent2[i]), max(parent1[i], parent2[i])
                     rand = np.random.rand()
-                    beta = (2*rand)**(1/(eta+1))
-                    child1[i] = 0.5*((1+beta)*x1 + (1-beta)*x2)
-                    child2[i] = 0.5*((1+beta)*x2 + (1-beta)*x1)
+                    beta = (2 * rand) ** (1 / (eta + 1))
+                    child1[i] = 0.5 * ((1 + beta) * x1 + (1 - beta) * x2)
+                    child2[i] = 0.5 * ((1 + beta) * x2 + (1 - beta) * x1)
                 else:
                     child1[i] = parent1[i]
                     child2[i] = parent2[i]
             else:
                 child1[i] = parent1[i]
                 child2[i] = parent2[i]
-        return child1.reshape(4,2), child2.reshape(4,2)
-        
+        return child1.reshape(4, 2), child2.reshape(4, 2)
+
     def mutate(self, ind, sigma, p):
         """
         Apply Gaussian mutation to an individual.
@@ -171,14 +176,23 @@ class GeneticEmbedding:
         numpy.ndarray
             Mutated individual.
         """
-        mask = np.random.rand(*ind.shape) < p #Decides which coordinates to randomly mutate. 
+        mask = (
+            np.random.rand(*ind.shape) < p
+        )  # Decides which coordinates to randomly mutate.
         gauss = np.random.normal(0, sigma, size=ind.shape)
         ind[mask] += gauss[mask]
         return ind
-    
+
     def embed(
-        self, alpha=[10,10,1], seed=1916, pop_size=2000,
-        generations=200, sigma_pos = 0.5, p_mut = 0.2, elitism = True):
+        self,
+        alpha=[10, 10, 1],
+        seed=1916,
+        pop_size=2000,
+        generations=200,
+        sigma_pos=0.5,
+        p_mut=0.2,
+        elitism=True,
+    ):
         """
         Run the genetic algorithm embedding for each data sample.
 
@@ -207,7 +221,7 @@ class GeneticEmbedding:
         """
         best_graphs = []
         for idx in range(self.B0_norm.shape[0]):
-            print('item index : ', idx)
+            print("item index : ", idx)
             population = self.init_population(pop_size)
 
             for gen in range(generations):
@@ -218,7 +232,7 @@ class GeneticEmbedding:
                 # produce offspring
                 offspring = []
                 for i in range(0, pop_size, 2):
-                    p1, p2 = sel[i], sel[(i+1)%pop_size]
+                    p1, p2 = sel[i], sel[(i + 1) % pop_size]
                     c1, c2 = self.sbx(p1, p2)
                     offspring.append(self.mutate(c1.copy(), sigma_pos, p_mut))
                     offspring.append(self.mutate(c2.copy(), sigma_pos, p_mut))
@@ -234,6 +248,6 @@ class GeneticEmbedding:
                 if gen % 30 == 0:
                     print(f"Gen {gen:3d} | best fitness {np.max(fit): .2f}")
 
-            best_graphs.append(offspring[0]) 
+            best_graphs.append(offspring[0])
 
         return best_graphs
