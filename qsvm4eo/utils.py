@@ -152,3 +152,47 @@ def plot_label_grid_with_points(
                 plt.gca().add_patch(rect)
 
     plt.show()
+
+
+def check_embeddability(
+    graph_list: list[np.ndarray],
+    max_atoms: int = 80,
+    max_distance_from_origin: float = 38.0,
+    min_distance_between_atoms: float = 5.0,
+) -> dict[int, dict[int, str]]:
+    """
+    Check whether a list of atom position graphs are embeddable on the AnalogQPU.
+
+    Parameters
+    ----------
+    graph_list : list[np.ndarray]
+        List of N graphs, each of shape (n_atoms, 2) representing atom coordinates in µm.
+    max_atoms : int
+        Maximum number of atoms allowed in a single register.
+    max_distance_from_origin : float
+        Maximum allowed distance (µm) of any atom from the origin.
+    min_distance_between_atoms : float
+        Minimum allowed distance (µm) between any pair of atoms.
+
+    Returns
+    -------
+    dict[int, dict[int, str]]
+        Dictionary mapping graph index to its violated constraints.
+        Empty dict means all graphs are embeddable.
+        Example: {3: {1: "atom too far from origin", 2: "atoms too close together"}}
+    """
+    failed_clauses = {}
+    for i, g in enumerate(graph_list):
+        v = []
+        # 1.Max atom number
+        if len(g) > max_atoms:
+            v.append(0)
+        # 2. Distance from origin
+        if np.any(np.linalg.norm(g, axis=1) > max_distance_from_origin):
+            v.append(1)
+        # 3. Distance between nodes
+        if np.any(pdist(g, metric="euclidean") < min_distance_between_atoms):
+            v.append(2)
+        if v:
+            failed_clauses[f"{i}"] = v
+    return failed_clauses
