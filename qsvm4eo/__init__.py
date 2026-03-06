@@ -3,6 +3,7 @@ __all__ = [
     "RadialEmbedding",
     "ConvolutionalEmbedding",
     "GeneticEmbedding",
+    "ChainEmbedding",
     "generate_myqlm_hamiltonian",
     "Kernel",
     "compute_excitation_count",
@@ -17,6 +18,7 @@ from .data_loader import load_data
 from .embeddings.convolutional_embedding import ConvolutionalEmbedding
 from .embeddings.genetic_embedding import GeneticEmbedding
 from .embeddings.radial_embedding import RadialEmbedding
+from .embeddings.chain_embedding import ChainEmbedding
 from .kernel import Kernel, compute_excitation_count
 from .model import QSVM
 from .myqlm_hamiltonian import generate_myqlm_hamiltonian
