@@ -12,10 +12,6 @@ class ChainEmbedding:
     ----------
     df : pd.DataFrame
         Dataset used. 
-    c : float
-        Scaling constant (µm). Controls inter-atom spacing.
-        Must be tuned so that no two atoms are closer than min_distance (5 µm).
-        Must be in the range [6, 24].
     """
 
     def __init__(
@@ -24,6 +20,13 @@ class ChainEmbedding:
     ):
         self.B0x_normalised = qsvm4eo.utils.normalise_array(df[["B02", "B03", "B04", "B08"]].to_numpy())
 
-    def embed(self, c=10) -> list[np.ndarray]:
-        x = -36 + c * np.arange(4)
+    def embed(self, c1=36, c2=10) -> list[np.ndarray]:
+        """
+        Parameters
+        ----------
+        c1,c2 : float 
+            Constants, need to be chosen so that the device constraints are verified. 
+            This means that |-c1|≤ 38 and |-c1 + 3c2| ≤ 38
+        """
+        x = -c1 + c2 * np.arange(4)
         return np.stack((np.broadcast_to(x, self.B0x_normalised.shape), self.B0x_normalised), axis=2)
