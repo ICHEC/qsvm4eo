@@ -8,15 +8,7 @@ class RadialEmbedding:
 
     Parameters
     ----------
-    max_feature : float
-        The largest feature in the training set.
-    shift : float
-        The shift hyperparameter.
-    scaling : float
-        The scaling hyperparameter.
-    n_features : int
-        The number of features.
-
+    df: pandas.Datafrea
     Notes
     -----
     If the feature vector is `(x1, x2, ..., xn)` (where n is the number of features),
@@ -33,26 +25,31 @@ class RadialEmbedding:
     E.g. choosing `shift=1` and `scaling=5` implies all the radii are between 5 and 10.
     """
 
-    def __init__(self, max_feature, shift, scaling, n_features):
-        self.shift = shift * scaling
-        self.scaling = scaling / max_feature
-
-        angles = np.linspace(0, 2 * np.pi, n_features, endpoint=False)
+    def __init__(self, df):
+        """
+        Parameters
+        ----------
+        df : pd.DataFrame
+        A dataset containing (at least) the following columns
+        ['Label', 'B02', 'B03', 'B04', 'B08']
+        """
+        self.B0x = df[["B02", "B03", "B04", "B08"]].to_numpy()
+        self.n_features = self.B0x.shape[1]
+        angles = np.linspace(0, 2 * np.pi, self.n_features, endpoint=False)
         self.unit_circle = np.array([np.cos(angles), np.sin(angles)]).T
 
-    def embed(self, x):
+    def embed(self, shift=1.0, scaling=5.4):
         """
-        Embed a data point into a set of qubit coordinates.
+        Generate the embedding
 
         Parameters
         ----------
-        x : np.ndarray
-            The feature vector to be embedded.
-
-        Returns
-        -------
-        np.ndarray
-            The qubit coordinates.
+        shift : float
+            The shift hyperparameter.
+        scaling : float
+            The scaling hyperparameter.
         """
-        radius = x * self.scaling + self.shift
-        return radius[:, None] * self.unit_circle
+        max_feature = np.max(self.B0x)
+        radius = (self.B0x / max_feature + shift) * scaling
+        coords = radius[:, :, None] * self.unit_circle[None, :, :]
+        return coords
