@@ -54,32 +54,26 @@ def compute_distributions(qbits, excitations=True):
         return probs
 
 
-# Load the data
-if args.embedding_type == "radial":
-    x_train, y_train, x_test, y_test, label_names = qsvm4eo.load_data(
-        data_path="..", num_features=args.num_features, scale_features=False
-    )
-if args.embedding_type == "convolutional":
-    df_train = pd.read_csv("./../data/train_32.csv")
-    df_test = pd.read_csv("./../data/test_32.csv")
-    label_names = {
-        1: "Urban",
-        2: "Agricultural",
-        3: "Forests/natural",
-    }
+
+df_train = pd.read_csv("./../data/train_32.csv")
+df_test = pd.read_csv("./../data/test_32.csv")
+label_names = {
+    1: "Urban",
+    2: "Agricultural",
+    3: "Forests/natural",
+}
 
 
 print("Embedding the data into qubits")
 # Embedding the data, transforming the features into qubit coordinates
 if args.embedding_type == "radial":
-    embedding = qsvm4eo.RadialEmbedding(
-        max_feature=np.max(x_train),
-        shift=1.0,
-        scaling=5.4,
-        n_features=args.num_features,
-    )
-    qbits_train = [embedding.embed(x) for x in x_train]
-    qbits_test = [embedding.embed(x) for x in x_test]
+    embedding_train = qsvm4eo.RadialEmbedding(df_train)
+    embedding_test = qsvm4eo.RadialEmbedding(df_test)
+    qbits_train = embedding_train.embed(shift=1.0, scaling=5.4)
+    qbits_test = embedding_test.embed(shift=1.0, scaling=5.4)
+    num_features = 4
+    y_train = df_train["Label"].values
+    y_test = df_test["Label"].values
 if args.embedding_type == "convolutional":
     embedding_train = qsvm4eo.ConvolutionalEmbedding(df_train)
     qbits_train, y_train = embedding_train.hsv_embedding(scaling=args.conv_scaling)
